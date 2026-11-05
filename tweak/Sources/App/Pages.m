@@ -172,6 +172,21 @@ UIViewController *SGPlayerSettingsPage(void) {
        @"and its sound matches what Spotify plays, from about 4 s after the song starts or you seek. Spotify still "
        @"streams its own copy, at its lowest quality while the next song has a file. Karaoke and speeds other than "
        @"1x keep Spotify's sound. Applies after you restart Spotify.")];
+       
+    [sections addObject:SGSection(@"AI DJ / Martini (Custom Key)", @[
+        [SGModRow switchRowWithKey:@"spotifyglass.ai_dj_enabled"
+                              title:@"Enable Custom AI DJ"
+                           subtitle:@"Replaces server-side Martini with your own LLM backend"],
+        [SGModRow textRowWithKey:@"spotifyglass.ai_dj_api_key"
+                            title:@"API Key"
+                      placeholder:@"sk-... / API Secret Key"],
+        [SGModRow choiceRowWithKey:@"spotifyglass.ai_dj_model"
+                              title:@"Model"
+                            choices:@[@"gpt-4o-mini", @"gpt-4o", @"claude-3-5-sonnet", @"gemini-1.5-flash"]],
+        [SGModRow textRowWithKey:@"spotifyglass.ai_dj_endpoint"
+                            title:@"Custom Endpoint"
+                      placeholder:@"https://api.openai.com/v1/chat/completions"]
+    ])];
 
     // The redesign's page leads with a card of its player and the background's control, the background's
     // rows and the Mini player section under it.
