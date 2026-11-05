@@ -174,18 +174,48 @@ UIViewController *SGPlayerSettingsPage(void) {
        @"1x keep Spotify's sound. Applies after you restart Spotify.")];
        
     [sections addObject:SGSection(@"AI DJ / Martini (Custom Key)", @[
-        [SGModRow switchRowWithKey:@"spotifyglass.ai_dj_enabled"
-                              title:@"Enable Custom AI DJ"
-                           subtitle:@"Replaces server-side Martini with your own LLM backend"],
-        [SGModRow textRowWithKey:@"spotifyglass.ai_dj_api_key"
-                            title:@"API Key"
-                      placeholder:@"sk-... / API Secret Key"],
-        [SGModRow choiceRowWithKey:@"spotifyglass.ai_dj_model"
-                              title:@"Model"
-                            choices:@[@"gpt-4o-mini", @"gpt-4o", @"claude-3-5-sonnet", @"gemini-1.5-flash"]],
-        [SGModRow textRowWithKey:@"spotifyglass.ai_dj_endpoint"
-                            title:@"Custom Endpoint"
-                      placeholder:@"https://api.openai.com/v1/chat/completions"]
+        SGOptionRow(@"spotifyglass.ai_dj_enabled",
+                    @"Enable Custom AI DJ",
+                    @"Replaces server-side Martini with your own LLM backend"),
+
+        SGChoiceRow(@"spotifyglass.ai_dj_model",
+                    @"Model",
+                    @[@"gpt-4o-mini", @"gpt-4o", @"claude-3-5-sonnet", @"gemini-1.5-flash"]),
+
+        SGActionRow(@"Set AI API Key", ^{
+            UIViewController *top = [UIApplication sharedApplication].keyWindow.rootViewController;
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"AI API Key"
+                                                                           message:@"Enter your OpenAI / Claude / Gemini API key:"
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
+            [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                textField.placeholder = @"sk-...";
+                textField.text = SGPrefString(@"spotifyglass.ai_dj_api_key", @"");
+                textField.secureTextEntry = YES;
+            }];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *act) {
+                NSString *text = alert.textFields.firstObject.text;
+                SGSetPrefString(@"spotifyglass.ai_dj_api_key", text ?: @"");
+            }]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+            [top presentViewController:alert animated:YES completion:nil];
+        }),
+
+        SGActionRow(@"Set Custom Endpoint", ^{
+            UIViewController *top = [UIApplication sharedApplication].keyWindow.rootViewController;
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"API Endpoint"
+                                                                           message:@"Default: https://api.openai.com/v1/chat/completions"
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
+            [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                textField.placeholder = @"https://api.openai.com/v1/chat/completions";
+                textField.text = SGPrefString(@"spotifyglass.ai_dj_endpoint", @"https://api.openai.com/v1/chat/completions");
+            }];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *act) {
+                NSString *text = alert.textFields.firstObject.text;
+                SGSetPrefString(@"spotifyglass.ai_dj_endpoint", text ?: @"");
+            }]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+            [top presentViewController:alert animated:YES completion:nil];
+        })
     ])];
 
     // The redesign's page leads with a card of its player and the background's control, the background's
